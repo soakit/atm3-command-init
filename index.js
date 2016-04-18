@@ -105,7 +105,7 @@ exports.register = function (commander) {
                 copyFiles(projectDir, settings.userName, settings.projectName, settings.template);
 
                 if (settings.template === 'mobile' || settings.template === 'pc') {
-                    var dirs = ['design', 'font', 'img', 'slice'];
+                    var dirs = ['font', 'img'];
 
                     dirs.forEach(function (dir) {
                         if (!exists(projectDir + '/' + dir))
@@ -126,7 +126,7 @@ function copyFiles(projectDir, username, projectName, template) {
     var fisConf = fs.readFileSync(__dirname + '/templates/fis-conf.js', {encoding: 'utf8'});
     fisConf = fisConf.replace('__userName__', username)
         .replace('__projectName__', projectName)
-        .replace('__scale__', isMobile ? 0.5 : 1.0);
+        //.replace('__scale__', isMobile ? 0.5 : 1.0);
 
     write(projectDir + "/fis-conf.js", fisConf, {encoding: 'utf8'});
     fis.log.info("generate fis-conf.js OK");

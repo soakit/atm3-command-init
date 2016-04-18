@@ -1,22 +1,28 @@
 fis.set("atm", {
-    useSprite: false, // 是否在开发阶段使用雪碧图合并
+    useSprite: true, // 是否在开发阶段使用雪碧图合并
     useOptimize: false, // 是否压缩css
     useHash: false, // 是否给文件名加上hash值
     useDomain: false,  // 是否使用CDN路径
+    useRempx: false, //是否开启rem和px的转换
     userName: '__userName__',  // RTX用户名
     projectName: '__projectName__', // 项目名称
-    wapstatic: 'http://wapstatic.kf0309.3g.qq.com/', // 默认测试环境网页访问地址
+    wapstatic: 'http://wapstatic.kf0309.3g.qq.com/', // 默认测试环境网页访问地址,
+    uploadService: 'http://wapstatic.kf0309.3g.qq.com/receiver/receiver2.php',
     cdnPath: '/2015/market/allanyu' // 上传到CDN的路径, 类似于/2015/market/allanyu, 注意: 必须从/MIG-WEB的子目录开始
 });
 
 fis.set('project.files', ['**', '.**', '.**/**'])
-    .set('project.ignore', ['node_modules/**', '.idea/**', '.gitignore', '**/_*.scss', '.docs/**',
+    .set('project.ignore', ['node_modules/**', 'local/**', "*.cfg", "*.md", "*.docx", '.idea/**', '.gitignore', '**/_*.scss', '.docs/**',
         'publish/**', '.dist/**', '.git/**', '.svn/**', 'gruntfile.js', 'gulpfile.js', 'fis-conf.js'])
     .set("project.fileType.text", "hbs");
 
 fis.hook('relative');
 
 var atmConf = fis.get("atm");
+var designSetting = {
+    width: 640,
+    baseFont: 100
+};
 
 if (atmConf.useDomain && !!atmConf.cdnPath) {
     atmConf.domain = "http://3gimg.qq.com/mig-web/" + atmConf.cdnPath;
@@ -36,7 +42,14 @@ fis.match('*', {
     useDomain: atmConf.useDomain,
     useHash: atmConf.useHash,
     spriteRelease: '/img/$1.png',
-    optimizer: atmConf.useOptimize && fis.plugin('clean-css')
+    optimizer: atmConf.useOptimize && fis.plugin('clean-css'),
+    postprocessor: fis.plugin('px2rem', {
+        useRempx:atmConf.useRempx,
+        baseFont: designSetting.baseFont,
+        designWidth: designSetting.width,
+        border: true,
+        mode: 'px2rem'
+    })
 }).match('/css/**.less', {
     rExt: '.css',
     parser: fis.plugin('less')
@@ -44,6 +57,8 @@ fis.match('*', {
 //    rExt: '.css',
 //    parser: fis.plugin('node-sass')
 }).match('**mixins?.{less,scss}', {
+    release: false
+}).match('/{less,scss}/*.{less,scss}', {
     release: false
 }).match('**mixins?/**.{less,scss}', {
     release: false
@@ -74,11 +89,12 @@ fis.match('**', {
     })
 }).match("::packager", {
     spriter: fis.plugin('csssprites', {
+        useRempx: atmConf.useRempx,
         htmlUseSprite: true,
         layout: 'matrix',
         margin: '16',
-        scale: 0.5,
-        //px2rem: 16,  // 是否使用rem单位
+        scale: 1,
+        px2rem: designSetting.baseFont,
         styleReg: /(<style(?:(?=\s)[\s\S]*?["'\s\w\/\-]>|>))([\s\S]*?)(<\/style\s*>|$)/ig
     }),
     postpackager: [fis.plugin('list-html'), fis.plugin('open', {
@@ -100,10 +116,22 @@ fis.match('**', {
         deploy: [fis.plugin('local-deliver', {
             to: './publish'
         }), fis.plugin('http-push', {
-            receiver: 'http://wapstatic.kf0309.3g.qq.com/receiver/receiver2.php',
+            receiver: atmConf.uploadService,
             to: '/data/wapstatic/' + atmConf.userName + '/' + atmConf.projectName
         })]
     });
+});
+
+fis.media('local').match("/css/**.{css,less}", {
+    useSprite: true,
+    optimizer: atmConf.useOptimize && fis.plugin('clean-css')
+}).match('**', {
+    useDomain: false, 
+    important: true,
+    domain: null,
+    deploy: fis.plugin('local-deliver', {
+        to: './local'
+    })
 });
 
 fis.media('cdn').match("*.{css,less,scss}", {
