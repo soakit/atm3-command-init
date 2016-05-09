@@ -1,6 +1,6 @@
 fis.set("atm", {
     useSprite: true, // 是否在开发阶段使用雪碧图合并
-    useOptimize: false, // 是否压缩css
+    useOptimize: false, // 是否压缩js/css
     useHash: false, // 是否给文件名加上hash值
     useDomain: false,  // 是否使用CDN路径
     useRempx: false, //是否开启rem和px的转换
@@ -8,7 +8,7 @@ fis.set("atm", {
     projectName: '__projectName__', // 项目名称
     wapstatic: 'http://wapstatic.kf0309.3g.qq.com/', // 默认测试环境网页访问地址,
     uploadService: 'http://wapstatic.kf0309.3g.qq.com/receiver/receiver2.php',
-    cdnPath: '/2015/market/allanyu' // 上传到CDN的路径, 类似于/2015/market/allanyu, 注意: 必须从/MIG-WEB的子目录开始
+    cdnPath: '2016/market/allanyu' // 上传到CDN的路径, 类似于/2015/market/allanyu, 注意: 必须从/MIG-WEB的子目录开始
 });
 
 fis.set('project.files', ['**', '.**', '.**/**'])
@@ -74,7 +74,8 @@ fis.match('*', {
     optimizer: fis.plugin('png-compressor')
 }).match('/js/**', {
     useDomain: atmConf.useDomain,
-    useHash: atmConf.useHash
+    useHash: atmConf.useHash,
+    optimizer: atmConf.useOptimize && fis.plugin('uglify-js')
 }).match('/mail/**', {
     useCompile: false
 }).match('/slice/**', {
