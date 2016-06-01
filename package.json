@@ -1,6 +1,6 @@
 {
   "name": "atm4-command-init",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "scaffold for atm",
   "main": "index.js",
   "scripts": {

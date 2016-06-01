@@ -118,7 +118,8 @@ fis.match('**', {
             to: './publish'
         }), fis.plugin('http-push', {
             receiver: atmConf.uploadService,
-            to: '/data/wapstatic/' + atmConf.userName + '/' + atmConf.projectName
+            to: '/data/wapstatic/' + atmConf.userName + '/' + atmConf.projectName,
+            type: 'zip'
         })]
     });
 });
