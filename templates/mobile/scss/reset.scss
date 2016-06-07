@@ -19,6 +19,9 @@ time, mark, audio, video {
     background:transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
+input, textarea, select{
+    font-family: inherit;
+}
 body {
     font-family: 'Helvetica Neue', 'Roboto', "microsoft yahei";
     line-height:1;
